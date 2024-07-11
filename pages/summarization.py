@@ -1,5 +1,5 @@
 import streamlit as st
-import fitz  # PyMuPDF
+import fitz  # PyMuPDF for PDF reading
 import docx2txt
 from transformers import pipeline
 
@@ -20,8 +20,7 @@ def summarize_text_t5(text, summarizer):
     try:
         if not text.strip():
             return ""
-        
-        # Split the text into chunks that fit the model's max_length
+        # Split text into chunks that fit model's max_length
         max_chunk_size = 512
         chunks = [text[i:i + max_chunk_size] for i in range(0, len(text), max_chunk_size)]
         summaries = [summarizer(chunk, max_length=150, min_length=30, do_sample=False)[0]['summary_text'] for chunk in chunks]
@@ -30,7 +29,7 @@ def summarize_text_t5(text, summarizer):
         st.error(f"Error summarizing text: {e}")
         return None
 
-# Main function for the summarization page
+# Main function for the Streamlit app
 def summarization_page():
     st.title("Text Summarization with T5")
 
@@ -41,11 +40,9 @@ def summarization_page():
 
         # Read PDF or DOCX and extract text
         if file_type == "pdf":
-            with st.spinner("Reading PDF..."):
-                document_text = read_pdf(uploaded_file)
+            document_text = read_pdf(uploaded_file)
         elif file_type == "docx":
-            with st.spinner("Reading DOCX..."):
-                document_text = read_docx(uploaded_file)
+            document_text = read_docx(uploaded_file)
         else:
             st.error("Unsupported file format. Please upload a PDF or DOCX file.")
             return
