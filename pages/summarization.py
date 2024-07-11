@@ -1,5 +1,19 @@
 import streamlit as st
+import fitz  # PyMuPDF
+import docx2txt
 from transformers import pipeline
+
+# Function to read PDF and extract text
+def read_pdf(file):
+    doc = fitz.open(stream=file.read(), filetype="pdf")
+    text = ""
+    for page in doc:
+        text += page.get_text()
+    return text
+
+# Function to read DOCX and extract text
+def read_docx(file):
+    return docx2txt.process(file)
 
 # Function to summarize text using T5 model
 def summarize_text_t5(text, summarizer):
@@ -32,6 +46,9 @@ def summarization_page():
         elif file_type == "docx":
             with st.spinner("Reading DOCX..."):
                 document_text = read_docx(uploaded_file)
+        else:
+            st.error("Unsupported file format. Please upload a PDF or DOCX file.")
+            return
         
         # Initialize T5 summarizer pipeline
         summarizer_t5 = pipeline("summarization", model="t5-small")
