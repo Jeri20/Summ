@@ -15,9 +15,13 @@ def read_pdf(file):
 def read_docx(file):
     return docx2txt.process(file)
 
-# Function to summarize text using a Language Model
-def summarize_text(text, summarizer):
+# Function to summarize text using T5 model
+def summarize_text_t5(text, summarizer):
     try:
+        # Ensure text is not empty or too short
+        if not text.strip():
+            return ""
+        
         summary = summarizer(text, max_length=150, min_length=30, do_sample=False)
         return summary[0]['summary_text']
     except Exception as e:
@@ -45,13 +49,12 @@ def get_answer(question, context, tokenizer, model):
         st.error(f"Error generating answer: {e}")
         return None
 
-# Streamlit app
+# Main Streamlit app logic
 def main():
     st.title("Text Summarization and Q&A with RAG")
 
-    # Upload document
+    # Page 1: File Upload and Text Extraction
     uploaded_file = st.file_uploader("Upload a PDF or DOCX file", type=["pdf", "docx"])
-
     if uploaded_file is not None:
         file_type = uploaded_file.name.split('.')[-1]
 
@@ -62,22 +65,17 @@ def main():
             with st.spinner("Reading DOCX..."):
                 document_text = read_docx(uploaded_file)
 
-        # Summarizer pipeline
-        summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
-
-        # Summarize the extracted text
+        # Page 2: Text Summarization using T5
+        summarizer_t5 = pipeline("summarization", model="t5-small")
         with st.spinner("Summarizing text..."):
-            summary = summarize_text(document_text, summarizer)
-        if summary:
-            st.subheader("Summary:")
-            st.write(summary)
+            summary_t5 = summarize_text_t5(document_text, summarizer_t5)
+        if summary_t5:
+            st.subheader("Summary (T5):")
+            st.write(summary_t5)
 
-            # Initialize RAG model
+            # Page 3: Question Answering with RAG
             tokenizer, model = initialize_rag()
-
-            # Ask question
             question = st.text_input("Ask a question about the document")
-
             if question:
                 with st.spinner("Getting answer..."):
                     answer = get_answer(question, document_text, tokenizer, model)
