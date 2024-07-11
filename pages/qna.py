@@ -12,7 +12,7 @@ def initialize_rag():
         st.error(f"Error initializing RAG components: {e}")
         st.stop()
 
-# Function to get answer from RAG model
+# Function to get an answer from the RAG model
 def get_answer(question, context, tokenizer, model):
     try:
         inputs = tokenizer(question, context, return_tensors="pt", truncation=True)
