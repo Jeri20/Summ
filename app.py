@@ -1,7 +1,7 @@
 import streamlit as st
 import fitz  # PyMuPDF
 import docx2txt
-from transformers import pipeline, RagTokenizer, RagRetriever, RagSequenceForGeneration
+from transformers import RagTokenizer, RagRetriever, RagSequenceForGeneration, pipeline
 
 # Function to read PDF and extract text
 def read_pdf(file):
@@ -28,10 +28,10 @@ def summarize_text_t5(text, summarizer):
         st.error(f"Error summarizing text: {e}")
         return None
 
-# Function to initialize RAG components
+# Function to initialize RAG components with trust_remote_code=True
 def initialize_rag():
     try:
-        tokenizer = RagTokenizer.from_pretrained("facebook/rag-sequence-nq")
+        tokenizer = RagTokenizer.from_pretrained("facebook/rag-sequence-nq", trust_remote_code=True)
         retriever = RagRetriever.from_pretrained("facebook/rag-sequence-nq", index_name="exact", trust_remote_code=True)
         model = RagSequenceForGeneration.from_pretrained("facebook/rag-sequence-nq", retriever=retriever, trust_remote_code=True)
         return tokenizer, model
