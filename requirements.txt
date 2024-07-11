@@ -1,0 +1,11 @@
+streamlit
+pymupdf
+docx2txt
+transformers
+faiss-cpu
+numpy
+datasets
+PyMuPDF
+docx2txt
+transformers
+torch
