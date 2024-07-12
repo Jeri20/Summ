@@ -1,31 +1,28 @@
 import streamlit as st
-from transformers import RagTokenizer, RagRetriever, RagSequenceForGeneration
-from datasets import load_dataset
+from transformers import pipeline
 
-# Load the tokenizer and retriever
-tokenizer = RagTokenizer.from_pretrained("facebook/rag-sequence-nq")
-
-# Load the dataset with trust_remote_code=True
-dataset = load_dataset("wiki_dpr", split="train", trust_remote_code=True)
-
-# Load the retriever with the dataset
-retriever = RagRetriever.from_pretrained("facebook/rag-sequence-nq", index_name="exact", use_dummy_dataset=True, dataset=dataset)
-
-# Load the model
-model = RagSequenceForGeneration.from_pretrained("facebook/rag-sequence-nq")
-
-st.title("Simple Q&A with RAG")
+st.title("Simple Q&A with Transformers")
 st.write("Ask a question and get an answer!")
 
+@st.cache(allow_output_mutation=True)
+def load_model():
+    # Load the question-answering pipeline
+    qa_pipeline = pipeline("question-answering")
+    return qa_pipeline
+
+qa_pipeline = load_model()
+
 question = st.text_input("Enter your question:")
-if question:
-    inputs = tokenizer(question, return_tensors="pt")
-    # Retrieve documents
-    doc_scores, doc_titles = retriever.retrieve(question, n_docs=5)
-    inputs['context_input_ids'] = tokenizer(doc_titles, return_tensors="pt", padding=True, truncation=True, max_length=512)['input_ids']
-    inputs['context_attention_mask'] = tokenizer(doc_titles, return_tensors="pt", padding=True, truncation=True, max_length=512)['attention_mask']
-    
-    # Generate the answer
-    outputs = model.generate(**inputs, num_beams=4, num_return_sequences=1)
-    answer = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
-    st.write(f"Answer: {answer}")
+context = st.text_area("Enter the context (optional):", height=200)
+
+if st.button("Get Answer"):
+    if question:
+        if context:
+            result = qa_pipeline(question=question, context=context)
+        else:
+            # Use a default context if none is provided
+            default_context = "The capital of France is Paris. The capital of Germany is Berlin."
+            result = qa_pipeline(question=question, context=default_context)
+        st.write(f"Answer: {result['answer']}")
+    else:
+        st.write("Please enter a question.")
