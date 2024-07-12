@@ -1,25 +1,25 @@
 import streamlit as st
-from transformers import DPRQuestionEncoderTokenizerFast, RagRetriever, RagSequenceForGeneration
+from transformers import DPRQuestionEncoderTokenizerFast, RagRetriever, RagTokenForGeneration
 
 # Function to initialize RAG components
 def initialize_rag():
     try:
-        # Initialize tokenizer
+        # Initialize tokenizer (use DPRQuestionEncoderTokenizerFast for DPR models)
         tokenizer = DPRQuestionEncoderTokenizerFast.from_pretrained("facebook/dpr-question_encoder-single-nq-base")
-        
-        # Initialize retriever with local DPR components
+
+        # Initialize retriever
         retriever = RagRetriever.from_pretrained(
             "facebook/rag-sequence-nq",
             index_name="exact",
             use_dummy_dataset=True
         )
-        
-        # Initialize model with retriever
-        model = RagSequenceForGeneration.from_pretrained(
+
+        # Initialize model
+        model = RagTokenForGeneration.from_pretrained(
             "facebook/rag-sequence-nq",
             retriever=retriever
         )
-        
+
         return tokenizer, model
     except Exception as e:
         st.error(f"Error initializing RAG components: {e}")
