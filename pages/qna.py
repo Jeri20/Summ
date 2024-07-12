@@ -4,9 +4,24 @@ from transformers import RagTokenizer, RagRetriever, RagSequenceForGeneration
 # Function to initialize RAG components
 def initialize_rag():
     try:
+        # Initialize tokenizer
         tokenizer = RagTokenizer.from_pretrained("facebook/rag-sequence-nq")
-        retriever = RagRetriever.from_pretrained("facebook/rag-sequence-nq", index_name="exact", trust_remote_code=True)
-        model = RagSequenceForGeneration.from_pretrained("facebook/rag-sequence-nq", retriever=retriever, trust_remote_code=True)
+        
+        # Initialize retriever with trust_remote_code=True
+        retriever = RagRetriever.from_pretrained(
+            "facebook/rag-sequence-nq",
+            index_name="exact",
+            use_dummy_dataset=True,
+            trust_remote_code=True
+        )
+        
+        # Initialize model with retriever and trust_remote_code=True
+        model = RagSequenceForGeneration.from_pretrained(
+            "facebook/rag-sequence-nq",
+            retriever=retriever,
+            trust_remote_code=True
+        )
+        
         return tokenizer, model
     except Exception as e:
         st.error(f"Error initializing RAG components: {e}")
