@@ -1,33 +1,23 @@
-import os
-import sys
 import streamlit as st
-from transformers import RagTokenizer, RagRetriever, RagSequenceForGeneration
-
-# Add the path to the DPR-main directory to the system path
-sys.path.append(os.path.abspath("DPR-main"))
-
-# Import necessary DPR components
-from dense_retriever import DenseRetriever  # Example: adjust as necessary
+from transformers import DPRQuestionEncoderTokenizerFast, RagRetriever, RagSequenceForGeneration
 
 # Function to initialize RAG components
 def initialize_rag():
     try:
         # Initialize tokenizer
-        tokenizer = RagTokenizer.from_pretrained("facebook/rag-sequence-nq")
+        tokenizer = DPRQuestionEncoderTokenizerFast.from_pretrained("facebook/dpr-question_encoder-single-nq-base")
         
         # Initialize retriever with local DPR components
         retriever = RagRetriever.from_pretrained(
             "facebook/rag-sequence-nq",
             index_name="exact",
-            use_dummy_dataset=True,
-            trust_remote_code=True
+            use_dummy_dataset=True
         )
         
         # Initialize model with retriever
         model = RagSequenceForGeneration.from_pretrained(
             "facebook/rag-sequence-nq",
-            retriever=retriever,
-            trust_remote_code=True
+            retriever=retriever
         )
         
         return tokenizer, model
