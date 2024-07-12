@@ -5,9 +5,9 @@ from datasets import load_dataset
 st.title("Simple Q&A with RAG")
 st.write("Ask a question and get an answer!")
 
-@st.cache_resource(allow_output_mutation=True)
+@st.cache(allow_output_mutation=True)
 def load_rag_model():
-    # Load the tokenizer and retriever
+    # Load the tokenizer
     tokenizer = RagTokenizer.from_pretrained("facebook/rag-sequence-nq")
     
     # Load the dataset with trust_remote_code=True
