@@ -1,21 +1,17 @@
 import streamlit as st
 from transformers import RagTokenizer, RagRetriever, RagSequenceForGeneration
-import os
 
 # Function to initialize RAG components
 def initialize_rag():
     try:
-        # Get Hugging Face token from secrets
-        hf_token = st.secrets["HF_TOKEN"]
-
         # Initialize tokenizer
-        tokenizer = RagTokenizer.from_pretrained("facebook/rag-sequence-nq", use_auth_token=hf_token)
+        tokenizer = RagTokenizer.from_pretrained("facebook/rag-sequence-nq")
         
-        # Initialize retriever with trust_remote_code=True
+        # Initialize retriever with authentication token and trust_remote_code=True
         retriever = RagRetriever.from_pretrained(
             "facebook/rag-sequence-nq",
             index_name="exact",
-            use_auth_token=hf_token,
+            use_auth_token=True,
             trust_remote_code=True
         )
         
@@ -23,7 +19,7 @@ def initialize_rag():
         model = RagSequenceForGeneration.from_pretrained(
             "facebook/rag-sequence-nq",
             retriever=retriever,
-            use_auth_token=hf_token,
+            use_auth_token=True,
             trust_remote_code=True
         )
         
