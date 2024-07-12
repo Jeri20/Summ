@@ -11,8 +11,8 @@ def load_rag_model():
         # Load the tokenizer
         tokenizer = RagTokenizer.from_pretrained("facebook/rag-sequence-nq")
         
-        # Load the dataset with trust_remote_code=True
-        dataset = load_dataset("wiki_dpr", split="train", trust_remote_code=True)
+        # Load the dataset with trust_remote_code=True and specify the config
+        dataset = load_dataset("wiki_dpr", "psgs_w100.nq.exact", split="train", trust_remote_code=True)
         
         # Load the retriever with the dataset
         retriever = RagRetriever.from_pretrained(
